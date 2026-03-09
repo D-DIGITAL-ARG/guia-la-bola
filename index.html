@@ -5,16 +5,41 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Luqui y Lolo - Ball</title>
-    <!-- Fonts for Naïve and Signal Graphics styles -->
+    <!-- Tailwind and specialized Fonts -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap"
+        rel="stylesheet" />
     <link
-        href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Kalam:wght@400;700&display=swap"
-        rel="stylesheet">
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#00ffff",
+                        "background-light": "#f5f8f8",
+                        "background-dark": "#0f2323",
+                        "hazard": "#facc15",
+                        "ball": "#f97316"
+                    },
+                    fontFamily: {
+                        "display": ["Space Grotesk", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
     <link rel="stylesheet" href="styles.css">
 </head>
 
-<body>
-    <!-- Gradient Blur / Acid Blur Background -->
-    <div class="background-gradient"></div>
+<body
+    class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 overflow-hidden">
+    <!-- Grid Background -->
+    <div class="absolute inset-0 grid-bg pointer-events-none z-0"></div>
 
     <div id="ui-layer">
         <!-- Signal Graphics Header -->
@@ -22,73 +47,63 @@
             <div style="display: flex; align-items: center;">
                 <div class="level-indicator">NIVEL: 00</div>
                 <button id="full-restart" class="signal-btn"
-                    style="margin-left: 15px; padding: 5px 10px; font-size: 0.8rem; border-color: var(--acid-yellow); color: var(--acid-yellow);">INICIAR
-                    NUEVAMENTE</button>
+                    style="margin-left: 15px; padding: 5px 10px; font-size: 1rem;">INICIAR NUEVAMENTE</button>
             </div>
             <div style="display: flex; align-items: center;">
                 <span class="score-indicator">PUNTOS: 00000</span>
                 <button id="in-game-retry" class="signal-btn"
-                    style="margin-left: 15px; padding: 5px 10px; font-size: 0.8rem;">REINICIAR NIVEL</button>
+                    style="margin-left: 15px; padding: 5px 10px; font-size: 1rem;">REINICIAR NIVEL</button>
             </div>
         </header>
 
         <!-- Start Modal (Visible by default) -->
         <div id="start-modal">
-            <h2 class="naive-text">Luqui y Lolo</h2>
-            <p class="naive-text" style="font-size: 1.3rem;">Dibuja líneas para guiar la bola hasta la caja amarilla. Si
-                la bola cae al suelo puedes empujarla nuevamente hacia arriba. ¡MUCHA SUERTE!</p>
-            <div style="display: flex; gap: 10px; margin-top: 20px;">
-                <button id="start-pro-btn" class="signal-btn" style="font-size: 1.2rem; padding: 10px 20px;">MODO
-                    PRO</button>
-                <button id="start-expert-btn" class="signal-btn"
-                    style="font-size: 1.2rem; padding: 10px 20px; border-color: var(--acid-pink); color: var(--acid-pink);">MODO
-                    EXPERTO</button>
+            <h2 class="text-primary font-bold tracking-wider uppercase mb-2">Luqui y Lolo</h2>
+            <p class="text-lg leading-relaxed text-slate-200">
+                Dibuja líneas para guiar la bola hasta la caja amarilla. Si la bola cae al suelo puedes empujarla
+                nuevamente hacia arriba. ¡MUCHA SUERTE!
+            </p>
+            <div class="flex flex-col gap-4 w-full mt-6">
+                <button id="start-pro-btn" class="signal-btn">COMENZAR PRO</button>
+                <button id="start-expert-btn" class="signal-btn-exp expert">COMENZAR EXPERTO</button>
             </div>
         </div>
 
         <!-- Metacognitive Feedback Modal (Hidden by default) -->
         <div id="feedback-modal" class="hidden">
-            <h2 class="naive-text">¡Ups!</h2>
-            <p class="naive-text">¿Por qué crees que la forma no alcanzó el objetivo?</p>
-            <p class="naive-text">¿Y si pruebas ajustando la rampa o el peso?</p>
+            <h2 class="text-secondary font-bold tracking-wider uppercase mb-2">¡Ups!</h2>
+            <p class="text-lg text-slate-200">¿Por qué crees que la forma no alcanzó el objetivo?</p>
+            <p class="text-lg text-slate-200 mb-4">¿Y si pruebas ajustando la rampa o el peso?</p>
             <button id="retry-btn" class="signal-btn">REINTENTAR</button>
         </div>
 
         <!-- Reward Modal (Hidden by default) -->
         <div id="reward-modal" class="hidden">
-            <h2 class="naive-text">¡Misión Cumplida!</h2>
-            <div class="trinket-badge">🌟</div>
-            <p class="naive-text" style="font-size: 1.3rem;">¡Has obtenido el emblema de la Gravedad!</p>
+            <h2 class="text-primary font-bold tracking-wider uppercase mb-2">¡Misión Cumplida!</h2>
+            <div class="trinket-badge my-4">🌟</div>
+            <p class="text-xl font-bold text-slate-100 mb-6">¡Has obtenido el emblema de la Gravedad!</p>
             <button id="next-btn" class="signal-btn">SIGUIENTE NIVEL</button>
         </div>
 
-        <!-- Pro Complete Modal (Hidden by default) -->
+        <!-- Pro Complete Modal -->
         <div id="pro-modal" class="hidden">
-            <h2 class="naive-text" style="color: var(--acid-cyan);">¡Felicidades Leyenda!</h2>
-            <p class="naive-text" style="font-size: 1.3rem;">Has completado los 10 niveles del modo
-                <strong>"PRO"</strong>.
-            </p>
-            <p class="naive-text" style="font-size: 1.3rem; margin: 10px 0;">Puntos conseguidos: <span
-                    id="pro-points">0</span></p>
-            <p class="naive-text" style="font-size: 1.3rem">¿Te atreves con el modo Experto?</p>
-            <div style="display: flex; gap: 10px; justify-content: center; margin-top: 15px; flex-wrap: wrap;">
-                <button id="expert-btn" class="signal-btn"
-                    style="border-color: var(--acid-pink); color: var(--acid-pink); font-size: 1.2rem;">COMENZAR MODO
-                    EXPERTO</button>
-                <button id="pro-restart-btn" class="signal-btn" style="font-size: 1.2rem;">INICIAR NUEVAMENTE</button>
+            <h2 class="text-primary font-bold tracking-wider uppercase mb-2">¡Felicidades Leyenda!</h2>
+            <p class="text-lg text-slate-200">Has completado los 10 niveles del modo <strong>"PRO"</strong>.</p>
+            <p class="text-2xl font-bold my-4 text-hazard">PUNTOS: <span id="pro-points">0</span></p>
+            <p class="text-md text-slate-400 mb-6">¿Te atreves con el modo Experto?</p>
+            <div class="flex flex-col gap-4 w-full">
+                <button id="expert-btn" class="signal-btn expert">MODO EXPERTO</button>
+                <button id="pro-restart-btn" class="signal-btn">INICIAR NUEVAMENTE</button>
             </div>
         </div>
 
-        <!-- Ultimate Completion Modal (Hidden by default) -->
+        <!-- Ultimate Completion Modal -->
         <div id="final-modal" class="hidden">
-            <h2 class="naive-text" style="color: var(--acid-yellow); font-size: 3.5rem;">¡YA ERES EXPERTO!</h2>
-            <p class="naive-text" style="font-size: 1.3rem;">Has completado todos los niveles del juego!.</p>
-            <div class="trinket-badge">👑</div>
-            <p class="naive-text" style="font-size: 1.5rem; margin: 10px 0;">Puntos conseguidos: <span
-                    id="final-points">0</span></p>
-            <button id="restart-game-btn" class="signal-btn" style="font-size: 1.2rem; margin-top: 15px;">VOLVER A
-                JUGAR</button>
-
+            <h2 class="text-hazard font-bold tracking-wider uppercase mb-2">¡YA ERES EXPERTO!</h2>
+            <p class="text-lg text-slate-200 mb-4">Has completado todos los niveles del juego!.</p>
+            <div class="trinket-badge my-4">👑</div>
+            <p class="text-2xl font-bold mb-8 text-primary">PUNTOS: <span id="final-points">0</span></p>
+            <button id="restart-game-btn" class="signal-btn">VOLVER A JUGAR</button>
         </div>
     </div>
 
@@ -99,4 +114,3 @@
 </body>
 
 </html>
-
