@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Luqui - Brain Physics</title>
+    <title>Luqui y Lolo - Ball</title>
     <!-- Fonts for Naïve and Signal Graphics styles -->
     <link
         href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Kalam:wght@400;700&display=swap"
@@ -20,30 +20,29 @@
         <!-- Signal Graphics Header -->
         <header class="signal-graphics">
             <div style="display: flex; align-items: center;">
-                <div class="level-indicator">NIVEL_01</div>
+                <div class="level-indicator">NIVEL: 00</div>
                 <button id="full-restart" class="signal-btn"
-                    style="margin-left: 15px; padding: 5px 10px; font-size: 0.8rem; border-color: var(--acid-yellow); color: var(--acid-yellow);">[
-                    INICIAR NUEVAMENTE ]</button>
+                    style="margin-left: 15px; padding: 5px 10px; font-size: 0.8rem; border-color: var(--acid-yellow); color: var(--acid-yellow);">INICIAR
+                    NUEVAMENTE</button>
             </div>
             <div style="display: flex; align-items: center;">
-                <span class="score-indicator">PTS: 0000</span>
+                <span class="score-indicator">PUNTOS: 00000</span>
                 <button id="in-game-retry" class="signal-btn"
-                    style="margin-left: 15px; padding: 5px 10px; font-size: 0.8rem;">[ REINICIAR NIVEL ]</button>
+                    style="margin-left: 15px; padding: 5px 10px; font-size: 0.8rem;">REINICIAR NIVEL</button>
             </div>
         </header>
 
         <!-- Start Modal (Visible by default) -->
         <div id="start-modal">
             <h2 class="naive-text">Luqui y Lolo</h2>
-            <p class="naive-text" style="font-size: 1.3rem;">Dibuja líneas para guiar la bola hasta el objetivo
-                amarillo.
-                ¡Usa la gravedad a tu favor!</p>
+            <p class="naive-text" style="font-size: 1.3rem;">Dibuja líneas para guiar la bola hasta la caja amarilla. Si
+                la bola cae al suelo puedes empujarla nuevamente hacia arriba. ¡MUCHA SUERTE!</p>
             <div style="display: flex; gap: 10px; margin-top: 20px;">
-                <button id="start-pro-btn" class="signal-btn" style="font-size: 1.2rem; padding: 10px 20px;">[ COMENZAR
-                    PRO ]</button>
+                <button id="start-pro-btn" class="signal-btn" style="font-size: 1.2rem; padding: 10px 20px;">COMENZAR
+                    PRO</button>
                 <button id="start-expert-btn" class="signal-btn"
-                    style="font-size: 1.2rem; padding: 10px 20px; border-color: var(--acid-pink); color: var(--acid-pink);">[
-                    COMENZAR EXPERTO ]</button>
+                    style="font-size: 1.2rem; padding: 10px 20px; border-color: var(--acid-pink); color: var(--acid-pink);">COMENZAR
+                    EXPERTO</button>
             </div>
         </div>
 
@@ -52,7 +51,7 @@
             <h2 class="naive-text">¡Ups!</h2>
             <p class="naive-text">¿Por qué crees que la forma no alcanzó el objetivo?</p>
             <p class="naive-text">¿Y si pruebas ajustando la rampa o el peso?</p>
-            <button id="retry-btn" class="signal-btn">[ REINTENTAR ]</button>
+            <button id="retry-btn" class="signal-btn">REINTENTAR</button>
         </div>
 
         <!-- Reward Modal (Hidden by default) -->
@@ -60,7 +59,7 @@
             <h2 class="naive-text">¡Misión Cumplida!</h2>
             <div class="trinket-badge">🌟</div>
             <p class="naive-text" style="font-size: 1.3rem;">¡Has obtenido el emblema de la Gravedad!</p>
-            <button id="next-btn" class="signal-btn">[ SIGUIENTE NIVEL ]</button>
+            <button id="next-btn" class="signal-btn">SIGUIENTE NIVEL</button>
         </div>
 
         <!-- Pro Complete Modal (Hidden by default) -->
@@ -69,19 +68,27 @@
             <p class="naive-text" style="font-size: 1.3rem;">Has completado los 10 niveles del modo
                 <strong>"PRO"</strong>.
             </p>
-            <p class="naive-text">¿Te atreves con el modo Experto?</p>
-            <button id="expert-btn" class="signal-btn"
-                style="border-color: var(--acid-pink); color: var(--acid-pink); font-size: 1.2rem;">[ COMENZAR MODO
-                EXPERTO ]</button>
+            <p class="naive-text" style="font-size: 1.3rem; margin: 10px 0;">Puntos conseguidos: <span
+                    id="pro-points">0</span></p>
+            <p class="naive-text" style="font-size: 1.3rem">¿Te atreves con el modo Experto?</p>
+            <div style="display: flex; gap: 10px; justify-content: center; margin-top: 15px; flex-wrap: wrap;">
+                <button id="expert-btn" class="signal-btn"
+                    style="border-color: var(--acid-pink); color: var(--acid-pink); font-size: 1.2rem;">COMENZAR MODO
+                    EXPERTO</button>
+                <button id="pro-restart-btn" class="signal-btn" style="font-size: 1.2rem;">INICIAR NUEVAMENTE</button>
+            </div>
         </div>
 
         <!-- Ultimate Completion Modal (Hidden by default) -->
         <div id="final-modal" class="hidden">
-            <h2 class="naive-text" style="color: var(--acid-yellow); font-size: 3.5rem;">¡MAESTRO!</h2>
-            <p class="naive-text" style="font-size: 1.3rem;">Has completado absolutamente todos los niveles.</p>
+            <h2 class="naive-text" style="color: var(--acid-yellow); font-size: 3.5rem;">¡YA ERES EXPERTO!</h2>
+            <p class="naive-text" style="font-size: 1.3rem;">Has completado todos los niveles del juego!.</p>
             <div class="trinket-badge">👑</div>
-            <button id="restart-game-btn" class="signal-btn" style="font-size: 1.2rem; margin-top: 15px;">[ VOLVER A
-                JUGAR ]</button>
+            <p class="naive-text" style="font-size: 1.5rem; margin: 10px 0;">Puntos conseguidos: <span
+                    id="final-points">0</span></p>
+            <button id="restart-game-btn" class="signal-btn" style="font-size: 1.2rem; margin-top: 15px;">VOLVER A
+                JUGAR</button>
+
         </div>
     </div>
 
