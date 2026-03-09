@@ -167,7 +167,7 @@ class Target {
 
         ctx.fillStyle = '#00ff41';
         ctx.font = '14px "Space Mono"';
-        ctx.fillText('TARGET', this.x + this.width / 2 - 25, this.y + this.height + 20);
+        ctx.fillText('', this.x + this.width / 3 - 25, this.y + this.height + 20);
     }
 }
 
@@ -220,16 +220,18 @@ class Game {
         // UI Bindings
         document.getElementById('start-pro-btn').addEventListener('click', () => {
             document.getElementById('start-modal').classList.add('hidden');
-            this.currentLevelIndex = 0;
-            this.loadLevel(this.currentLevelIndex);
+            this.currentLevelIndex = 9;
+console.log(`load level pro`);
+            this.loadLevel(this.currentLevelIndex - 1);
             this.isPlaying = true;
             this.lastTime = performance.now();
         });
 
         document.getElementById('start-expert-btn').addEventListener('click', () => {
             document.getElementById('start-modal').classList.add('hidden');
-            this.currentLevelIndex = 10;
-            this.loadLevel(this.currentLevelIndex);
+            this.currentLevelIndex = 19;
+console.log(`load level expert`);
+            this.loadLevel(this.currentLevelIndex - 1);
             this.isPlaying = true;
             this.lastTime = performance.now();
         });
@@ -237,21 +239,23 @@ class Game {
         document.getElementById('restart-game-btn').addEventListener('click', () => {
             document.getElementById('final-modal').classList.add('hidden');
             document.getElementById('start-modal').classList.remove('hidden');
-            this.currentLevelIndex = 0;
+            this.currentLevelIndex = 1;
             this.score = 0;
             this.isPlaying = false; // Wait for player to click start again
-            this.loadLevel(this.currentLevelIndex);
+            this.loadLevel(this.currentLevelIndex - 1);
             this.render(); // force render
+            document.getElementById('full-restart').style.display = '';
+            document.getElementById('in-game-retry').style.display = '';
         });
 
         document.getElementById('retry-btn').addEventListener('click', () => {
             document.getElementById('feedback-modal').classList.add('hidden');
-            this.loadLevel(this.currentLevelIndex);
+            this.loadLevel(this.currentLevelIndex - 1);
         });
 
         // In-game Retry binding
         document.getElementById('in-game-retry').addEventListener('click', () => {
-            this.loadLevel(this.currentLevelIndex);
+            this.loadLevel(this.currentLevelIndex - 1);
         });
 
         // Full Restart binding
@@ -262,8 +266,23 @@ class Game {
         // Expert Mode start binding
         document.getElementById('expert-btn').addEventListener('click', () => {
             document.getElementById('pro-modal').classList.add('hidden');
-            this.currentLevelIndex = 10;
-            this.loadLevel(this.currentLevelIndex);
+            this.currentLevelIndex = 11;
+            this.loadLevel(this.currentLevelIndex - 1);
+            document.getElementById('full-restart').style.display = '';
+            document.getElementById('in-game-retry').style.display = '';
+        });
+
+        // Pro Restart binding
+        document.getElementById('pro-restart-btn').addEventListener('click', () => {
+            document.getElementById('pro-modal').classList.add('hidden');
+            document.getElementById('start-modal').classList.remove('hidden');
+            this.currentLevelIndex = 1;
+            this.score = 0;
+            this.isPlaying = false; // Wait for player to click start again
+            this.loadLevel(this.currentLevelIndex - 1);
+            this.render(); // force render
+            document.getElementById('full-restart').style.display = '';
+            document.getElementById('in-game-retry').style.display = '';
         });
 
         // Load first Level
@@ -272,26 +291,38 @@ class Game {
         // Iniciar Bucle Visual
         this.lastTime = performance.now();
         requestAnimationFrame(this.gameLoop.bind(this));
-
         console.log("[SISTEMA] Motor de Física Inicializado.");
     }
 
     loadLevel(index) {
+console.log(`Index load level: `, index);
         this.rigidBodies = []; // Clear drawings
         this.currentStroke = [];
         this.isDrawing = false;
 
+
         // Update UI
-        let isExpert = index >= 10;
-        let displayLevel = isExpert ? index - 9 : index + 1;
-        let prefix = isExpert ? 'EXP' : 'NIVEL';
-        document.querySelector('.level-indicator').innerText = `${prefix}_${displayLevel < 10 ? '0' + displayLevel : displayLevel}`;
-        this.updateScoreUI();
+	if (this.currentLevelIndex > 0 && this.currentLevelIndex < 11) {
+        const levelPro = this.currentLevelIndex;
+console.log(`level 1 a 10: `, levelPro);
+	        document.querySelector('.level-indicator').innerText = `NIVEL PRO: ` + levelPro;
+	        this.updateScoreUI();
+	}
+
+	if (this.currentLevelIndex > 10) {		
+	        const levelExp = this.currentLevelIndex - 10;
+console.log(`level 11 a 20: `, levelExp);
+	        document.querySelector('.level-indicator').innerText = `NIVEL EXPERTO: ` + levelExp;
+        	this.updateScoreUI();
+	}
+
 
         // Dark theme toggle for Expert Mode
         if (index >= 10) {
+console.log(`dark mode ok: `, index);
             document.body.classList.add('expert-mode');
         } else {
+console.log(`dark mode no: `, index);
             document.body.classList.remove('expert-mode');
         }
 
@@ -437,7 +468,9 @@ class Game {
         ];
 
         // Ensure we don't go out of bounds
-        let levelData = levels[Math.min(index, levels.length - 1)];
+        let levelData = levels[Math.min(index, levels.length -1)];
+console.log(`DATA: `, levelData);
+console.log(`LEVEL: `, levels);
 
         this.ball = new Ball(levelData.bx, levelData.by, 20);
         this.target = new Target(levelData.tx, levelData.ty, levelData.tw, levelData.th, levelData.type);
@@ -714,7 +747,7 @@ class Game {
     }
 
     updateScoreUI() {
-        document.querySelector('.score-indicator').innerText = `PTS: ${this.score.toString().padStart(4, '0')}`;
+        document.querySelector('.score-indicator').innerText = `PUNTOS: ${this.score.toString().padStart(5, '0')}`;
     }
 
     showFeedback() {
@@ -723,14 +756,20 @@ class Game {
     }
 
     showReward() {
-        if (this.currentLevelIndex === 9) {
+        if (this.currentLevelIndex === 10) {
             // Reached end of Pro levels, show Pro Complete modal
             const proModal = document.getElementById('pro-modal');
+            document.getElementById('pro-points').innerText = this.score.toString().padStart(5, '0');
+            document.getElementById('full-restart').style.display = 'none';
+            document.getElementById('in-game-retry').style.display = 'none';
             proModal.classList.remove('hidden');
             return;
-        } else if (this.currentLevelIndex === 19) {
+        } else if (this.currentLevelIndex === 20) {
             // Reached end of Expert levels
             const finalModal = document.getElementById('final-modal');
+            document.getElementById('final-points').innerText = this.score.toString().padStart(5, '0');
+            document.getElementById('full-restart').style.display = 'none';
+            document.getElementById('in-game-retry').style.display = 'none';
             finalModal.classList.remove('hidden');
             return;
         }
@@ -744,7 +783,15 @@ class Game {
 
         // Update popup Level Text dynamically
         const title = rewardModal.querySelector('h2');
-        title.innerText = `¡Nivel ${this.currentLevelIndex + 1} Superado!`;
+
+if (this.currentLevelIndex >= 10) {
+	const nivelActual = this.currentLevelIndex -10
+        title.innerText = `¡Nivel ${nivelActual} EXPERTO Superado!`;
+} else {
+	const nivelActual = this.currentLevelIndex
+        title.innerText = `¡Nivel ${nivelActual} PRO Superado!`;
+}
+
 
         rewardModal.classList.remove('hidden');
 
@@ -753,10 +800,11 @@ class Game {
             rewardModal.classList.add('hidden');
             this.currentLevelIndex++;
             // Wrap around if finishing expert mode or handle win screen, optionally
-            if (this.currentLevelIndex >= 20) {
+            if (this.currentLevelIndex > 20) {
+console.log(FIN);
                 this.currentLevelIndex = 0; // restart or handle final win screen later
             }
-            this.loadLevel(this.currentLevelIndex);
+            this.loadLevel(this.currentLevelIndex - 1);
         };
     }
 
@@ -831,4 +879,3 @@ class Game {
 window.addEventListener('DOMContentLoaded', () => {
     window.game = new Game();
 });
-
