@@ -39,6 +39,12 @@ class RigidShape {
         this.updateBounds();
     }
 
+    reposition(x, y) {
+        this.pos.x = x;
+        this.pos.y = y;
+        this.updateBounds();
+    }
+
     updateBounds() {
         this.minY = Infinity;
         this.maxY = -Infinity;
@@ -84,6 +90,15 @@ class Ball {
         this.mass = radius;
     }
 
+    reposition(x, y) {
+        let dx = x - this.pos.x;
+        let dy = y - this.pos.y;
+        this.pos.x = x;
+        this.pos.y = y;
+        this.oldPos.x += dx;
+        this.oldPos.y += dy;
+    }
+
     update(gravity, dt) {
         // Verlet Integration
         let vel = this.pos.sub(this.oldPos);
@@ -119,13 +134,24 @@ class Target {
 
         this.walls = [];
         if (this.type === 'box') {
-            // Define las paredes del contenedor en forma de U
-            // [left wall, right wall, bottom wall]
-            this.walls = [
-                { pos: new Vec2(this.x, this.y + this.height / 2), w: this.thickness, h: this.height, isBottom: false },
-                { pos: new Vec2(this.x + this.width, this.y + this.height / 2), w: this.thickness, h: this.height, isBottom: false },
-                { pos: new Vec2(this.x + this.width / 2, this.y + this.height), w: this.width + this.thickness, h: this.thickness, isBottom: true }
-            ];
+            this.updateWalls();
+        }
+    }
+
+    updateWalls() {
+        // [left wall, right wall, bottom wall]
+        this.walls = [
+            { pos: new Vec2(this.x, this.y + this.height / 2), w: this.thickness, h: this.height, isBottom: false },
+            { pos: new Vec2(this.x + this.width, this.y + this.height / 2), w: this.thickness, h: this.height, isBottom: false },
+            { pos: new Vec2(this.x + this.width / 2, this.y + this.height), w: this.width + this.thickness, h: this.thickness, isBottom: true }
+        ];
+    }
+
+    reposition(x, y) {
+        this.x = x;
+        this.y = y;
+        if (this.type === 'box') {
+            this.updateWalls();
         }
     }
 
@@ -496,12 +522,22 @@ console.log(`DATA: `, levelData);
 console.log(`LEVEL: `, levels);
 
         this.ball = new Ball(levelData.bx, levelData.by, 20);
+        let bRel = this.getRelPos(levelData.bx, levelData.by);
+        this.ball.relX = bRel.relX;
+        this.ball.relY = bRel.relY;
+
         this.target = new Target(levelData.tx, levelData.ty, levelData.tw, levelData.th, levelData.type);
+        let tRel = this.getRelPos(levelData.tx, levelData.ty);
+        this.target.relX = tRel.relX;
+        this.target.relY = tRel.relY;
 
         // Agregar algunos estáticos predefinidos si los hubiera (obstáculos)
         if (levelData.obstacles) {
             for (let obs of levelData.obstacles) {
                 let shape = new RigidShape(obs);
+                let sRel = this.getRelPos(shape.pos.x, shape.pos.y);
+                shape.relX = sRel.relX;
+                shape.relY = sRel.relY;
                 this.rigidBodies.push(shape); // Already marked isStatic = true in constructor
             }
         }
@@ -513,6 +549,35 @@ resize() {
     this.updateBoundaries();
     this.canvas.width = this.width;
     this.canvas.height = this.height;
+
+    // Reposition all active game objects
+    if (this.ball && this.ball.relX !== undefined) {
+        this.ball.reposition(
+            this.boundaryMinX + this.ball.relX * this.frameWidth,
+            this.boundaryMinY + this.ball.relY * this.frameHeight
+        );
+    }
+    if (this.target && this.target.relX !== undefined) {
+        this.target.reposition(
+            this.boundaryMinX + this.target.relX * this.frameWidth,
+            this.boundaryMinY + this.target.relY * this.frameHeight
+        );
+    }
+    for (let body of this.rigidBodies) {
+        if (body.relX !== undefined) {
+            body.reposition(
+                this.boundaryMinX + body.relX * this.frameWidth,
+                this.boundaryMinY + body.relY * this.frameHeight
+            );
+        }
+    }
+}
+
+getRelPos(x, y) {
+    return {
+        relX: (x - this.boundaryMinX) / this.frameWidth,
+        relY: (y - this.boundaryMinY) / this.frameHeight
+    };
 }
 
 bindEvents() {
@@ -597,6 +662,9 @@ bindEvents() {
         if (simplified.length < 2) simplified = points;
 
         let body = new RigidShape(simplified);
+        let sRel = this.getRelPos(body.pos.x, body.pos.y);
+        body.relX = sRel.relX;
+        body.relY = sRel.relY;
         console.log(`[FÍSICA] Nuevo Rígido creado con masa aproximada.`);
         this.rigidBodies.push(body);
     }
@@ -637,6 +705,11 @@ bindEvents() {
         // Update Ball
         if (this.ball) {
             this.ball.update(this.physicsConfig.gravity, deltaTime);
+
+            // Update relative position for resizing
+            let bRel = this.getRelPos(this.ball.pos.x, this.ball.pos.y);
+            this.ball.relX = bRel.relX;
+            this.ball.relY = bRel.relY;
 
             // Ball Floor Collision (Límite inferior del marco)
             if (this.ball.pos.y + this.ball.radius > this.boundaryMaxY) {
