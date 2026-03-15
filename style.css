@@ -117,21 +117,21 @@ body.expert-mode .grid-bg {
 @media (max-width: 600px) {
     .signal-graphics {
         flex-direction: column;
-        justify-content: space-between;
         gap: 8px;
         align-items: flex-start;
-	text-align: center;
+	text-align: right;
         padding: 0.5rem 1rem;
     }
 
     .expert-mode .signal-btn {
-        justify-content: space-between;
+        flex-direction: column;
+        align-items: flex-start;
 	text-align: right;
     }
 
     .header-group {
         width: 100%;
-        justify-content: space-between;
+        justify-content: flex-end;
     }
 }
 
