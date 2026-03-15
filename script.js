@@ -129,7 +129,10 @@ class Target {
         this.y = y;
         this.width = width;
         this.height = height;
-        this.thickness = 10;
+        
+        const scaleFactor = Math.min(window.innerWidth, window.innerHeight) / 800;
+        this.thickness = Math.max(6, 10 * scaleFactor);
+        
         this.type = type;
 
         this.walls = [];
@@ -379,166 +382,181 @@ console.log(`dark mode no: `, index);
         let cx = this.width / 2;
         let cy = this.height / 2;
 
+        // Basic Level Setup based on index (10 Pro UX + 10 Expert)
+        // Normalize coordinates: 0.0 to 1.0 within the boundary frame
         const levels = [
             // Level 1: Basic drop - Caja grande
-            { bx: cx - 200, by: cy - 200, tx: cx - 200, ty: this.height - 150, tw: 150, th: 150, type: 'box', obstacles: [] },
+            { bx: 0.3, by: 0.2, tx: 0.3, ty: 0.8, tw: 0.15, th: 0.12, type: 'box' },
             // Level 2: Offset (Needs a slope) - Caja chica
-            { bx: cx - 300, by: cy - 200, tx: cx + 100, ty: this.height - 120, tw: 80, th: 100, type: 'box', obstacles: [] },
+            { bx: 0.2, by: 0.2, tx: 0.7, ty: 0.8, tw: 0.1, th: 0.08, type: 'box' },
             // Level 3: Wall block in the middle
             {
-                bx: cx - 300, by: cy - 100, tx: cx + 250, ty: this.height - 150, tw: 120, th: 120, type: 'box', obstacles: [
-                    [{ x: cx, y: cy }, { x: cx, y: this.height }] // Muro vertical
+                bx: 0.2, by: 0.3, tx: 0.8, ty: 0.8, tw: 0.1, th: 0.1, type: 'box', obstacles: [
+                    [{ x: 0.5, y: 0.5 }, { x: 0.5, y: 1.0 }] // Muro vertical
                 ]
             },
             // Level 4: Funnel (Embudo) structure
             {
-                bx: cx - 300, by: 100, tx: cx - 50, ty: this.height - 100, tw: 100, th: 80, type: 'box', obstacles: [
-                    [{ x: cx - 200, y: cy }, { x: cx - 70, y: cy + 150 }],
-                    [{ x: cx + 200, y: cy }, { x: cx + 70, y: cy + 150 }]
+                bx: 0.2, by: 0.1, tx: 0.45, ty: 0.85, tw: 0.1, th: 0.08, type: 'box', obstacles: [
+                    [{ x: 0.3, y: 0.5 }, { x: 0.43, y: 0.7 }],
+                    [{ x: 0.7, y: 0.5 }, { x: 0.57, y: 0.7 }]
                 ]
             },
             // Level 5: Static Tunnel bounds
             {
-                bx: cx - 300, by: 100, tx: cx + 300, ty: this.height - 150, tw: 100, th: 100, type: 'box', obstacles: [
-                    [{ x: cx - 150, y: cy - 50 }, { x: cx + 150, y: cy - 50 }], // Techo tunel
-                    [{ x: cx - 150, y: cy + 50 }, { x: cx + 150, y: cy + 50 }]  // Piso tunel
+                bx: 0.2, by: 0.1, tx: 0.8, ty: 0.8, tw: 0.1, th: 0.1, type: 'box', obstacles: [
+                    [{ x: 0.35, y: 0.45 }, { x: 0.65, y: 0.45 }], // Techo tunel
+                    [{ x: 0.35, y: 0.55 }, { x: 0.65, y: 0.55 }]  // Piso tunel
                 ]
             },
             // Level 6: Floating zone with platform underneath
             {
-                bx: cx - 350, by: 200, tx: cx + 200, ty: cy, tw: 100, th: 100, type: 'zone', obstacles: [
-                    [{ x: cx + 200, y: cy + 100 }, { x: cx + 300, y: cy + 100 }] // Plataforma bajo la zona
+                bx: 0.2, by: 0.2, tx: 0.7, ty: 0.5, tw: 0.1, th: 0.1, type: 'zone', obstacles: [
+                    [{ x: 0.7, y: 0.6 }, { x: 0.8, y: 0.6 }] // Plataforma bajo la zona
                 ]
             },
             // Level 7: Multiple random walls
             {
-                bx: cx + 200, by: 100, tx: cx - 300, ty: this.height - 120, tw: 120, th: 120, type: 'box', obstacles: [
-                    [{ x: cx, y: 100 }, { x: cx, y: 300 }],
-                    [{ x: cx - 150, y: 300 }, { x: cx - 150, y: this.height }]
+                bx: 0.8, by: 0.1, tx: 0.2, ty: 0.8, tw: 0.1, th: 0.1, type: 'box', obstacles: [
+                    [{ x: 0.5, y: 0.1 }, { x: 0.5, y: 0.3 }],
+                    [{ x: 0.35, y: 0.3 }, { x: 0.35, y: 1.0 }]
                 ]
             },
             // Level 8: Zig Zag setup
             {
-                bx: cx, by: 100, tx: cx, ty: this.height - 120, tw: 150, th: 150, type: 'box', obstacles: [
-                    [{ x: cx - 200, y: 250 }, { x: cx + 100, y: 350 }],
-                    [{ x: cx + 200, y: 450 }, { x: cx - 100, y: 550 }]
+                bx: 0.5, by: 0.1, tx: 0.5, ty: 0.85, tw: 0.12, th: 0.1, type: 'box', obstacles: [
+                    [{ x: 0.3, y: 0.25 }, { x: 0.6, y: 0.35 }],
+                    [{ x: 0.7, y: 0.45 }, { x: 0.4, y: 0.55 }]
                 ]
             },
             // Level 9: Narrow gap dropping
             {
-                bx: cx - 200, by: 100, tx: cx + 250, ty: this.height - 150, tw: 100, th: 150, type: 'box', obstacles: [
-                    [{ x: cx, y: 0 }, { x: cx, y: cy - 50 }],
-                    [{ x: cx, y: cy + 50 }, { x: cx, y: this.height }]
+                bx: 0.3, by: 0.1, tx: 0.75, ty: 0.8, tw: 0.1, th: 0.12, type: 'box', obstacles: [
+                    [{ x: 0.5, y: 0.0 }, { x: 0.5, y: 0.45 }],
+                    [{ x: 0.5, y: 0.55 }, { x: 0.5, y: 1.0 }]
                 ]
             },
             // Level 10: Enclosed box start
             {
-                bx: cx - 400, by: 50, tx: cx + 350, ty: this.height - 100, tw: 80, th: 80, type: 'box', obstacles: [
-                    [{ x: cx - 200, y: cy }, { x: cx - 100, y: cy }],
-                    [{ x: cx + 100, y: cy }, { x: cx + 200, y: cy }],
-                    [{ x: cx - 50, y: cy + 150 }, { x: cx + 50, y: cy + 150 }]
+                bx: 0.1, by: 0.05, tx: 0.85, ty: 0.85, tw: 0.08, th: 0.08, type: 'box', obstacles: [
+                    [{ x: 0.3, y: 0.5 }, { x: 0.4, y: 0.5 }],
+                    [{ x: 0.6, y: 0.5 }, { x: 0.7, y: 0.5 }],
+                    [{ x: 0.45, y: 0.65 }, { x: 0.55, y: 0.65 }]
                 ]
             },
             // --- EXPERT MODE LEVELS ---
             // Level 11: Tight gap floating target
             {
-                bx: cx - 300, by: 50, tx: cx + 250, ty: cy - 100, tw: 80, th: 80, type: 'box', obstacles: [
-                    [{ x: cx - 100, y: 0 }, { x: cx - 100, y: cy + 50 }],
-                    [{ x: cx + 50, y: this.height }, { x: cx + 50, y: cy - 50 }]
+                bx: 0.2, by: 0.05, tx: 0.75, ty: 0.4, tw: 0.08, th: 0.08, type: 'box', obstacles: [
+                    [{ x: 0.4, y: 0.0 }, { x: 0.4, y: 0.55 }],
+                    [{ x: 0.55, y: 1.0 }, { x: 0.55, y: 0.45 }]
                 ]
             },
             // Level 12: Suspended container, tiny gap
             {
-                bx: cx, by: 50, tx: cx, ty: cy + 150, tw: 60, th: 100, type: 'box', obstacles: [
-                    [{ x: cx - 100, y: 150 }, { x: cx - 50, y: 250 }],
-                    [{ x: cx + 100, y: 150 }, { x: cx + 50, y: 250 }],
-                    [{ x: cx - 200, y: 400 }, { x: cx + 200, y: 400 }]
+                bx: 0.5, by: 0.05, tx: 0.5, ty: 0.65, tw: 0.06, th: 0.1, type: 'box', obstacles: [
+                    [{ x: 0.4, y: 0.15 }, { x: 0.45, y: 0.25 }],
+                    [{ x: 0.6, y: 0.15 }, { x: 0.55, y: 0.25 }],
+                    [{ x: 0.3, y: 0.4 }, { x: 0.7, y: 0.4 }]
                 ]
             },
             // Level 13: Multiple diagonal ramps
             {
-                bx: cx - 350, by: 50, tx: cx + 300, ty: this.height - 150, tw: 100, th: 80, type: 'box', obstacles: [
-                    [{ x: cx - 250, y: 200 }, { x: cx, y: 300 }],
-                    [{ x: cx + 250, y: 350 }, { x: cx - 50, y: 450 }],
-                    [{ x: cx - 250, y: 600 }, { x: cx + 150, y: 550 }]
+                bx: 0.15, by: 0.05, tx: 0.8, ty: 0.8, tw: 0.1, th: 0.08, type: 'box', obstacles: [
+                    [{ x: 0.25, y: 0.2 }, { x: 0.5, y: 0.3 }],
+                    [{ x: 0.75, y: 0.35 }, { x: 0.45, y: 0.45 }],
+                    [{ x: 0.25, y: 0.6 }, { x: 0.65, y: 0.55 }]
                 ]
             },
             // Level 14: Vertical Plinko
             {
-                bx: cx, by: 50, tx: cx, ty: this.height - 100, tw: 120, th: 80, type: 'box', obstacles: [
-                    [{ x: cx - 100, y: 200 }, { x: cx + 50, y: 220 }],
-                    [{ x: cx + 100, y: 400 }, { x: cx - 50, y: 420 }],
-                    [{ x: cx - 100, y: 600 }, { x: cx + 50, y: 620 }]
+                bx: 0.5, by: 0.05, tx: 0.5, ty: 0.8, tw: 0.12, th: 0.08, type: 'box', obstacles: [
+                    [{ x: 0.4, y: 0.2 }, { x: 0.55, y: 0.22 }],
+                    [{ x: 0.6, y: 0.4 }, { x: 0.45, y: 0.42 }],
+                    [{ x: 0.4, y: 0.6 }, { x: 0.55, y: 0.62 }]
                 ]
             },
             // Level 15: Target behind a huge wall
             {
-                bx: cx - 400, by: 50, tx: cx + 200, ty: this.height - 150, tw: 80, th: 80, type: 'box', obstacles: [
-                    [{ x: cx, y: 0 }, { x: cx, y: this.height - 200 }]
+                bx: 0.1, by: 0.05, tx: 0.7, ty: 0.8, tw: 0.08, th: 0.08, type: 'box', obstacles: [
+                    [{ x: 0.5, y: 0.0 }, { x: 0.5, y: 0.8 }]
                 ]
             },
             // Level 16: Two thin towers and a small target
             {
-                bx: cx - 300, by: 50, tx: cx + 300, ty: this.height - 150, tw: 60, th: 80, type: 'box', obstacles: [
-                    [{ x: cx - 100, y: 300 }, { x: cx - 100, y: this.height }],
-                    [{ x: cx + 100, y: 200 }, { x: cx + 100, y: this.height }]
+                bx: 0.2, by: 0.05, tx: 0.8, ty: 0.8, tw: 0.06, th: 0.08, type: 'box', obstacles: [
+                    [{ x: 0.4, y: 0.3 }, { x: 0.4, y: 1.0 }],
+                    [{ x: 0.6, y: 0.2 }, { x: 0.6, y: 1.0 }]
                 ]
             },
             // Level 17: U-Turn required
             {
-                bx: cx - 200, by: 200, tx: cx - 300, ty: 50, tw: 100, th: 80, type: 'box', obstacles: [
-                    [{ x: cx - 100, y: 0 }, { x: cx - 100, y: 400 }],
-                    [{ x: cx - 400, y: 400 }, { x: cx - 100, y: 400 }],
-                    [{ x: cx - 400, y: 0 }, { x: cx - 400, y: 200 }]
+                bx: 0.3, by: 0.2, tx: 0.2, ty: 0.05, tw: 0.1, th: 0.08, type: 'box', obstacles: [
+                    [{ x: 0.4, y: 0.0 }, { x: 0.4, y: 0.4 }],
+                    [{ x: 0.1, y: 0.4 }, { x: 0.4, y: 0.4 }],
+                    [{ x: 0.1, y: 0.0 }, { x: 0.1, y: 0.2 }]
                 ]
             },
             // Level 18: Zone target suspended mid-air
             {
-                bx: cx - 400, by: 100, tx: cx + 200, ty: 200, tw: 100, th: 100, type: 'zone', obstacles: [
-                    [{ x: cx, y: 0 }, { x: cx, y: 400 }],
-                    [{ x: cx + 100, y: 400 }, { x: cx + 400, y: 400 }]
+                bx: 0.1, by: 0.1, tx: 0.7, ty: 0.2, tw: 0.1, th: 0.1, type: 'zone', obstacles: [
+                    [{ x: 0.5, y: 0.0 }, { x: 0.5, y: 0.4 }],
+                    [{ x: 0.6, y: 0.4 }, { x: 0.9, y: 0.4 }]
                 ]
             },
             // Level 19: Extremely narrow shaft
             {
-                bx: cx, by: 50, tx: cx, ty: this.height - 150, tw: 80, th: 100, type: 'box', obstacles: [
-                    [{ x: cx - 50, y: 200 }, { x: cx - 50, y: this.height - 300 }],
-                    [{ x: cx + 50, y: 200 }, { x: cx + 50, y: this.height - 300 }]
+                bx: 0.5, by: 0.05, tx: 0.5, ty: 0.8, tw: 0.08, th: 0.1, type: 'box', obstacles: [
+                    [{ x: 0.45, y: 0.2 }, { x: 0.45, y: 0.7 }],
+                    [{ x: 0.55, y: 0.2 }, { x: 0.55, y: 0.7 }]
                 ]
             },
             // Level 20: The Ultimate Challenge
             {
-                bx: cx - 400, by: 50, tx: cx + 300, ty: cy - 100, tw: 70, th: 70, type: 'box', obstacles: [
-                    [{ x: cx - 200, y: 0 }, { x: cx - 200, y: cy + 100 }],
-                    [{ x: cx, y: this.height }, { x: cx, y: cy - 100 }],
-                    [{ x: cx + 200, y: 0 }, { x: cx + 200, y: cy + 100 }]
+                bx: 0.1, by: 0.05, tx: 0.8, ty: 0.4, tw: 0.07, th: 0.07, type: 'box', obstacles: [
+                    [{ x: 0.3, y: 0.0 }, { x: 0.3, y: 0.6 }],
+                    [{ x: 0.5, y: 1.0 }, { x: 0.5, y: 0.4 }],
+                    [{ x: 0.7, y: 0.0 }, { x: 0.7, y: 0.6 }]
                 ]
             }
         ];
 
         // Ensure we don't go out of bounds
-        let levelData = levels[Math.min(index, levels.length -1)];
-console.log(`DATA: `, levelData);
-console.log(`LEVEL: `, levels);
+        let levelData = levels[Math.min(index, levels.length - 1)];
 
-        this.ball = new Ball(levelData.bx, levelData.by, 20);
-        let bRel = this.getRelPos(levelData.bx, levelData.by);
-        this.ball.relX = bRel.relX;
-        this.ball.relY = bRel.relY;
+        // Adaptive scaling based on screen size
+        const scaleFactor = Math.min(this.frameWidth, this.frameHeight) / 800;
+        const ballSize = Math.max(12, 20 * scaleFactor);
+        const tWidth = levelData.tw * this.frameWidth;
+        const tHeight = levelData.th * this.frameHeight;
 
-        this.target = new Target(levelData.tx, levelData.ty, levelData.tw, levelData.th, levelData.type);
-        let tRel = this.getRelPos(levelData.tx, levelData.ty);
-        this.target.relX = tRel.relX;
-        this.target.relY = tRel.relY;
+        // Map relative coordinates to absolute pixels
+        const bx = this.boundaryMinX + levelData.bx * this.frameWidth;
+        const by = this.boundaryMinY + levelData.by * this.frameHeight;
+        const tx = this.boundaryMinX + levelData.tx * this.frameWidth;
+        const ty = this.boundaryMinY + levelData.ty * this.frameHeight;
+
+        this.ball = new Ball(bx, by, ballSize);
+        this.ball.relX = levelData.bx;
+        this.ball.relY = levelData.by;
+
+        this.target = new Target(tx, ty, tWidth, tHeight, levelData.type);
+        this.target.relX = levelData.tx;
+        this.target.relY = levelData.ty;
 
         // Agregar algunos estáticos predefinidos si los hubiera (obstáculos)
         if (levelData.obstacles) {
             for (let obs of levelData.obstacles) {
-                let shape = new RigidShape(obs);
+                // Map relative obstacle points to absolute pixels
+                let mappedObs = obs.map(p => ({
+                    x: this.boundaryMinX + p.x * this.frameWidth,
+                    y: this.boundaryMinY + p.y * this.frameHeight
+                }));
+                let shape = new RigidShape(mappedObs);
                 let sRel = this.getRelPos(shape.pos.x, shape.pos.y);
                 shape.relX = sRel.relX;
                 shape.relY = sRel.relY;
-                this.rigidBodies.push(shape); // Already marked isStatic = true in constructor
+                this.rigidBodies.push(shape);
             }
         }
 
