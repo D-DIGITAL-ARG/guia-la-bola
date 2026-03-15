@@ -101,7 +101,7 @@ body.expert-mode .grid-bg {
     /* Remove blur */
     padding: 0.25rem 0.50rem;
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 0.7px;
     pointer-events: auto;
     width: 100%;
 }
@@ -202,7 +202,7 @@ body.expert-mode .grid-bg {
     cursor: pointer;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 0.5px;
     border-radius: 1rem;
     border: none;
     border-bottom: 4px solid rgba(0, 0, 0, 0.2);
@@ -218,7 +218,7 @@ body.expert-mode .grid-bg {
     cursor: pointer;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 0.5px;
     border-radius: 1rem;
     border: none;
     border-bottom: 4px solid rgba(0, 0, 0, 0.2);
