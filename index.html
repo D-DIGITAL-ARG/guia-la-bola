@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Luqui y Lolo - Ball</title>
+    <title>Guia la Bola</title>
     <!-- Tailwind and specialized Fonts -->
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap"
@@ -44,21 +44,19 @@
     <div id="ui-layer">
         <!-- Signal Graphics Header -->
         <header class="signal-graphics">
-            <div style="display: flex; align-items: center;">
-                <div class="level-indicator">NIVEL: 00</div>
-                <button id="full-restart" class="signal-btn"
-                    style="margin-left: 15px; padding: 5px 10px; font-size: 1rem;">INICIAR NUEVAMENTE</button>
+            <div class="header-group">
+                <span class="level-indicator">NIVEL: 00</span>
+                <button id="full-restart" class="signal-btn compact">INICIAR NUEVAMENTE</button>
             </div>
-            <div style="display: flex; align-items: center;">
+            <div class="header-group">
                 <span class="score-indicator">PUNTOS: 00000</span>
-                <button id="in-game-retry" class="signal-btn"
-                    style="margin-left: 15px; padding: 5px 10px; font-size: 1rem;">REINICIAR NIVEL</button>
+                <button id="in-game-retry" class="signal-btn compact">REINICIAR NIVEL</button>
             </div>
         </header>
 
         <!-- Start Modal (Visible by default) -->
         <div id="start-modal">
-            <h2 class="text-primary font-bold tracking-wider uppercase mb-2">Luqui y Lolo</h2>
+            <h2 class="text-primary font-bold tracking-wider uppercase mb-2">Guía la Bola</h2>
             <p class="text-2xl text-slate-100">
                 Dibuja líneas para guiar la bola hasta la caja amarilla. Si la bola cae al suelo puedes empujarla
                 nuevamente hacia arriba.<br><strong>¡MUCHA SUERTE!</strong></br>

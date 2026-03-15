@@ -20,7 +20,7 @@ class Vec2 {
  * Basic Rigid Body for user drawn shapes
  */
 class RigidShape {
-    constructor(points) {
+    constructor(points, color = '#ffffff') {
         // Find center of mass roughly
         let cx = 0, cy = 0;
         for (let p of points) {
@@ -34,6 +34,7 @@ class RigidShape {
         this.vel = new Vec2(0, 0);
         this.points = points.map(p => new Vec2(p.x - cx, p.y - cy)); // Local points
         this.isStatic = true; // LINEAS AHORA SON ESTATICAS
+        this.color = color;
 
         // Bounding box for simple floor collision
         this.updateBounds();
@@ -65,9 +66,11 @@ class RigidShape {
         this.updateBounds();
     }
 
-    render(ctx, style) {
+    render(ctx) {
         if (this.points.length < 2) return;
 
+        ctx.strokeStyle = this.color;
+        
         ctx.beginPath();
         let first = this.points[0];
         ctx.moveTo(this.pos.x + first.x, this.pos.y + first.y);
@@ -112,10 +115,10 @@ class Ball {
     render(ctx) {
         ctx.beginPath();
         ctx.arc(this.pos.x, this.pos.y, this.radius, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(255, 187, 0, 1)';
+        ctx.fillStyle = 'rgba(255, 213, 0, 1)';
         ctx.fill();
         ctx.lineWidth = 4;
-        ctx.strokeStyle = 'rgba(255, 187, 0, 0.7)';
+        ctx.strokeStyle = 'rgba(255, 187, 0, 0.5)';
         ctx.stroke();
     }
 }
@@ -129,10 +132,10 @@ class Target {
         this.y = y;
         this.width = width;
         this.height = height;
-        
+
         const scaleFactor = Math.min(window.innerWidth, window.innerHeight) / 800;
         this.thickness = Math.max(6, 10 * scaleFactor);
-        
+
         this.type = type;
 
         this.walls = [];
@@ -236,13 +239,13 @@ class Game {
 
         // Configuración visual "Naïve" para pincel
         this.brushStyle = {
-            color: '#22ffcbff',
-            glow: '#adffffff', // Acid pink para iluminar trazo
+            color: '#00ffff',
+            glow: '#5effffff', // Acid pink para iluminar trazo
             width: 6
         };
 
         // Screen Detection and Boundary Frame (3% smaller)
-        this.boundaryPadding = 0.03; 
+        this.boundaryPadding = 0.03;
         this.updateBoundaries();
 
         this.init();
@@ -251,13 +254,15 @@ class Game {
     updateBoundaries() {
         this.width = window.innerWidth;
         this.height = window.innerHeight;
-        
+
         this.frameWidth = this.width * (1 - this.boundaryPadding);
-        this.frameHeight = this.height * (1 - this.boundaryPadding);
-        
+        // boundaryMinY adjusted to start below header (approx 55px total from top)
+        this.boundaryMinY = 55;
+
+        this.frameHeight = (this.height - this.boundaryMinY) * (1 - (this.boundaryPadding / 2));
+
         this.boundaryMinX = (this.width - this.frameWidth) / 2;
         this.boundaryMaxX = this.boundaryMinX + this.frameWidth;
-        this.boundaryMinY = (this.height - this.frameHeight) / 2;
         this.boundaryMaxY = this.boundaryMinY + this.frameHeight;
     }
 
@@ -269,7 +274,7 @@ class Game {
         document.getElementById('start-pro-btn').addEventListener('click', () => {
             document.getElementById('start-modal').classList.add('hidden');
             this.currentLevelIndex = 1;
-console.log(`load level pro`);
+            console.log(`load level pro`);
             this.loadLevel(this.currentLevelIndex - 1);
             this.isPlaying = true;
             this.lastTime = performance.now();
@@ -280,7 +285,7 @@ console.log(`load level pro`);
         document.getElementById('start-expert-btn').addEventListener('click', () => {
             document.getElementById('start-modal').classList.add('hidden');
             this.currentLevelIndex = 11;
-console.log(`load level expert`);
+            console.log(`load level expert`);
             this.loadLevel(this.currentLevelIndex - 1);
             this.isPlaying = true;
             this.lastTime = performance.now();
@@ -347,34 +352,34 @@ console.log(`load level expert`);
     }
 
     loadLevel(index) {
-console.log(`Index load level: `, index);
+        console.log(`Index load level: `, index);
         this.rigidBodies = []; // Clear drawings
         this.currentStroke = [];
         this.isDrawing = false;
 
 
         // Update UI
-	if (this.currentLevelIndex > 0 && this.currentLevelIndex < 11) {
-        const levelPro = this.currentLevelIndex;
-console.log(`level 1 a 10: `, levelPro);
-	        document.querySelector('.level-indicator').innerText = `NIVEL PRO: ` + levelPro;
-	        this.updateScoreUI();
-	}
+        if (this.currentLevelIndex > 0 && this.currentLevelIndex < 11) {
+            const levelPro = this.currentLevelIndex;
+            console.log(`level 1 a 10: `, levelPro);
+            document.querySelector('.level-indicator').innerText = `NIVEL PRO: ` + levelPro;
+            this.updateScoreUI();
+        }
 
-	if (this.currentLevelIndex > 10) {		
-	        const levelExp = this.currentLevelIndex - 10;
-console.log(`level 11 a 20: `, levelExp);
-	        document.querySelector('.level-indicator').innerText = `NIVEL EXPERTO: ` + levelExp;
-        	this.updateScoreUI();
-	}
+        if (this.currentLevelIndex > 10) {
+            const levelExp = this.currentLevelIndex - 10;
+            console.log(`level 11 a 20: `, levelExp);
+            document.querySelector('.level-indicator').innerText = `NIVEL EXPERTO: ` + levelExp;
+            this.updateScoreUI();
+        }
 
 
         // Dark theme toggle for Expert Mode
         if (index >= 10) {
-console.log(`dark mode ok: `, index);
+            console.log(`dark mode ok: `, index);
             document.body.classList.add('expert-mode');
         } else {
-console.log(`dark mode no: `, index);
+            console.log(`dark mode no: `, index);
             document.body.classList.remove('expert-mode');
         }
 
@@ -552,7 +557,8 @@ console.log(`dark mode no: `, index);
                     x: this.boundaryMinX + p.x * this.frameWidth,
                     y: this.boundaryMinY + p.y * this.frameHeight
                 }));
-                let shape = new RigidShape(mappedObs);
+                const color = 'rgba(255, 213, 0, 1)'; // Target Box color
+                const shape = new RigidShape(mappedObs, color);
                 let sRel = this.getRelPos(shape.pos.x, shape.pos.y);
                 shape.relX = sRel.relX;
                 shape.relY = sRel.relY;
@@ -563,54 +569,54 @@ console.log(`dark mode no: `, index);
         this.levelCompleted = false;
     }
 
-resize() {
-    this.updateBoundaries();
-    this.canvas.width = this.width;
-    this.canvas.height = this.height;
+    resize() {
+        this.updateBoundaries();
+        this.canvas.width = this.width;
+        this.canvas.height = this.height;
 
-    // Reposition all active game objects
-    if (this.ball && this.ball.relX !== undefined) {
-        this.ball.reposition(
-            this.boundaryMinX + this.ball.relX * this.frameWidth,
-            this.boundaryMinY + this.ball.relY * this.frameHeight
-        );
-    }
-    if (this.target && this.target.relX !== undefined) {
-        this.target.reposition(
-            this.boundaryMinX + this.target.relX * this.frameWidth,
-            this.boundaryMinY + this.target.relY * this.frameHeight
-        );
-    }
-    for (let body of this.rigidBodies) {
-        if (body.relX !== undefined) {
-            body.reposition(
-                this.boundaryMinX + body.relX * this.frameWidth,
-                this.boundaryMinY + body.relY * this.frameHeight
+        // Reposition all active game objects
+        if (this.ball && this.ball.relX !== undefined) {
+            this.ball.reposition(
+                this.boundaryMinX + this.ball.relX * this.frameWidth,
+                this.boundaryMinY + this.ball.relY * this.frameHeight
             );
         }
+        if (this.target && this.target.relX !== undefined) {
+            this.target.reposition(
+                this.boundaryMinX + this.target.relX * this.frameWidth,
+                this.boundaryMinY + this.target.relY * this.frameHeight
+            );
+        }
+        for (let body of this.rigidBodies) {
+            if (body.relX !== undefined) {
+                body.reposition(
+                    this.boundaryMinX + body.relX * this.frameWidth,
+                    this.boundaryMinY + body.relY * this.frameHeight
+                );
+            }
+        }
     }
-}
 
-getRelPos(x, y) {
-    return {
-        relX: (x - this.boundaryMinX) / this.frameWidth,
-        relY: (y - this.boundaryMinY) / this.frameHeight
-    };
-}
+    getRelPos(x, y) {
+        return {
+            relX: (x - this.boundaryMinX) / this.frameWidth,
+            relY: (y - this.boundaryMinY) / this.frameHeight
+        };
+    }
 
-bindEvents() {
-    window.addEventListener('resize', this.resize.bind(this));
+    bindEvents() {
+        window.addEventListener('resize', this.resize.bind(this));
 
-    // Ratón
-    this.canvas.addEventListener('mousedown', this.startDrawing.bind(this));
-    this.canvas.addEventListener('mousemove', this.draw.bind(this));
-    window.addEventListener('mouseup', this.stopDrawing.bind(this));
+        // Ratón
+        this.canvas.addEventListener('mousedown', this.startDrawing.bind(this));
+        this.canvas.addEventListener('mousemove', this.draw.bind(this));
+        window.addEventListener('mouseup', this.stopDrawing.bind(this));
 
-    // Táctil
-    this.canvas.addEventListener('touchstart', this.startDrawingTouch.bind(this), { passive: false });
-    this.canvas.addEventListener('touchmove', this.drawTouch.bind(this), { passive: false });
-    this.canvas.addEventListener('touchend', this.stopDrawingTouch.bind(this), { passive: false });
-}
+        // Táctil
+        this.canvas.addEventListener('touchstart', this.startDrawingTouch.bind(this), { passive: false });
+        this.canvas.addEventListener('touchmove', this.drawTouch.bind(this), { passive: false });
+        this.canvas.addEventListener('touchend', this.stopDrawingTouch.bind(this), { passive: false });
+    }
 
     // -- CAPTURA DE INPUT --
 
@@ -661,7 +667,7 @@ bindEvents() {
         if (!this.isDrawing) return;
         this.isDrawing = false;
 
-        // Validar tamaño mínimo para convetirse en objeto físico
+        // Validar tamaño mínimo para convertirse en objeto físico
         if (this.currentStroke.length > 5) {
             this.convertStrokeToPhysicsObject(this.currentStroke);
         }
@@ -679,7 +685,7 @@ bindEvents() {
         }
         if (simplified.length < 2) simplified = points;
 
-        let body = new RigidShape(simplified);
+        let body = new RigidShape(simplified, this.brushStyle.color);
         let sRel = this.getRelPos(body.pos.x, body.pos.y);
         body.relX = sRel.relX;
         body.relY = sRel.relY;
@@ -897,15 +903,15 @@ bindEvents() {
         // Update popup Level Text dynamically
         const title = rewardModal.querySelector('h2');
 
-if (this.currentLevelIndex >= 10) {
-	const nivelActual = this.currentLevelIndex -10
-        title.innerText = `¡Nivel ${nivelActual} EXPERTO Superado!`;
-        document.getElementById('in-game-retry').style.display = 'none';
-} else {
-	const nivelActual = this.currentLevelIndex
-        title.innerText = `¡Nivel ${nivelActual} PRO Superado!`;
-        document.getElementById('in-game-retry').style.display = 'none';
-}
+        if (this.currentLevelIndex >= 10) {
+            const nivelActual = this.currentLevelIndex - 10
+            title.innerText = `¡Nivel ${nivelActual} EXPERTO Superado!`;
+            document.getElementById('in-game-retry').style.display = 'none';
+        } else {
+            const nivelActual = this.currentLevelIndex
+            title.innerText = `¡Nivel ${nivelActual} PRO Superado!`;
+            document.getElementById('in-game-retry').style.display = 'none';
+        }
 
 
         rewardModal.classList.remove('hidden');
@@ -949,7 +955,7 @@ if (this.currentLevelIndex >= 10) {
         this.ctx.shadowColor = 'rgba(255, 255, 255, 0.4)';
 
         for (let body of this.rigidBodies) {
-            body.render(this.ctx, this.brushStyle);
+            body.render(this.ctx);
         }
 
         // Disable shadow for ball
