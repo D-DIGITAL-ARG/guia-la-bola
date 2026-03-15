@@ -257,8 +257,8 @@ class Game {
         this.height = window.innerHeight;
 
         this.frameWidth = this.width * (1 - this.boundaryPadding);
-        // boundaryMinY adjusted to start below header (approx 55px total from top)
-        this.boundaryMinY = 55;
+        // boundaryMinY adjusted to start below header (approx 55px on desktop, 120px on mobile)
+        this.boundaryMinY = window.innerWidth < 600 ? 120 : 55;
 
         this.frameHeight = (this.height - this.boundaryMinY) * (1 - (this.boundaryPadding / 2));
 
@@ -460,7 +460,7 @@ class Game {
             },
             // Level 12: Suspended container, tiny gap
             {
-                bx: 0.5, by: 0.05, tx: 0.5, ty: 0.65, tw: 0.06, th: 0.1, type: 'box', obstacles: [
+                bx: 0.5, by: 0.05, tx: 0.5, ty: 0.65, tw: 0.11, th: 0.1, type: 'box', obstacles: [
                     [{ x: 0.4, y: 0.15 }, { x: 0.45, y: 0.25 }],
                     [{ x: 0.6, y: 0.15 }, { x: 0.55, y: 0.25 }],
                     [{ x: 0.3, y: 0.4 }, { x: 0.7, y: 0.4 }]
@@ -490,7 +490,7 @@ class Game {
             },
             // Level 16: Two thin towers and a small target
             {
-                bx: 0.2, by: 0.05, tx: 0.8, ty: 0.8, tw: 0.06, th: 0.08, type: 'box', obstacles: [
+                bx: 0.2, by: 0.05, tx: 0.8, ty: 0.8, tw: 0.09, th: 0.08, type: 'box', obstacles: [
                     [{ x: 0.4, y: 0.3 }, { x: 0.4, y: 1.0 }],
                     [{ x: 0.6, y: 0.2 }, { x: 0.6, y: 1.0 }]
                 ]
@@ -512,14 +512,14 @@ class Game {
             },
             // Level 19: Extremely narrow shaft
             {
-                bx: 0.5, by: 0.05, tx: 0.5, ty: 0.8, tw: 0.08, th: 0.1, type: 'box', obstacles: [
+                bx: 0.5, by: 0.05, tx: 0.5, ty: 0.8, tw: 0.10, th: 0.1, type: 'box', obstacles: [
                     [{ x: 0.45, y: 0.2 }, { x: 0.45, y: 0.7 }],
                     [{ x: 0.55, y: 0.2 }, { x: 0.55, y: 0.7 }]
                 ]
             },
             // Level 20: The Ultimate Challenge
             {
-                bx: 0.1, by: 0.05, tx: 0.8, ty: 0.4, tw: 0.07, th: 0.07, type: 'box', obstacles: [
+                bx: 0.1, by: 0.05, tx: 0.8, ty: 0.4, tw: 0.10, th: 0.07, type: 'box', obstacles: [
                     [{ x: 0.3, y: 0.0 }, { x: 0.3, y: 0.6 }],
                     [{ x: 0.5, y: 1.0 }, { x: 0.5, y: 0.4 }],
                     [{ x: 0.7, y: 0.0 }, { x: 0.7, y: 0.6 }]
@@ -835,11 +835,23 @@ class Game {
                         } else {
                             this.ball.oldPos = this.ball.oldPos.add(normal.mult(-overlap * 0.5));
                         }
-                    }
                 }
             }
         }
+
+        // Final Safety Clamping for ball
+        if (this.ball) {
+            if (this.ball.pos.y + this.ball.radius > this.boundaryMaxY) {
+                this.ball.pos.y = this.boundaryMaxY - this.ball.radius;
+                // Stop downward momentum if it somehow got past the previous check
+                if (this.ball.oldPos.y < this.ball.pos.y) this.ball.oldPos.y = this.ball.pos.y; 
+            }
+            if (this.ball.pos.x - this.ball.radius < this.boundaryMinX) this.ball.pos.x = this.boundaryMinX + this.ball.radius;
+            if (this.ball.pos.x + this.ball.radius > this.boundaryMaxX) this.ball.pos.x = this.boundaryMaxX - this.ball.radius;
+            if (this.ball.pos.y - this.ball.radius < this.boundaryMinY) this.ball.pos.y = this.boundaryMinY + this.ball.radius;
+        }
     }
+}
 
     checkWinCondition() {
         if (this.levelCompleted) return;
