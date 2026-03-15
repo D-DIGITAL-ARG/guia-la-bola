@@ -81,39 +81,24 @@ body.expert-mode .grid-bg {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    padding: 20px;
+    padding: 2.5%;
 }
 
 /* Signal Graphics: Headers and Data */
 .signal-graphics {
     display: flex;
     justify-content: space-between;
-    align-items: center;
     color: var(--primary);
     font-size: 1.2rem;
     text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
     border-bottom: 1px solid rgba(0, 255, 255, 0.1);
     background: rgba(8, 161, 161, 0.05);
     backdrop-filter: blur(8px);
-    padding: 10px 15px;
+    padding: 15px 20px;
     border-radius: 1rem;
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 2px;
     pointer-events: auto;
-    gap: 10px;
-}
-
-.header-group {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.signal-graphics .signal-btn {
-    width: auto;
-    padding: 5px 12px;
-    font-size: 0.9rem;
-    margin: 0;
 }
 
 .expert-mode .signal-graphics {
@@ -166,64 +151,6 @@ body.expert-mode .grid-bg {
     text-shadow: 0 0 10px rgba(0, 255, 255, 0.4);
     text-transform: uppercase;
     font-weight: 700;
-}
-
-/* ... existing expert mode styles ... */
-
-/* Mobile Adjustments */
-@media (max-width: 768px) {
-    .signal-graphics {
-        flex-direction: column;
-        padding: 6px 10px;
-        font-size: 0.85rem;
-        gap: 3px;
-        border-radius: 0.5rem;
-    }
-    
-    .header-group {
-        width: 100%;
-        justify-content: space-between;
-        gap: 5px;
-    }
-
-    .signal-graphics .signal-btn {
-        padding: 4px 8px;
-        font-size: 0.75rem;
-    }
-
-    #start-modal,
-    #feedback-modal,
-    #reward-modal,
-    #pro-modal,
-    #final-modal {
-        padding: 1.25rem;
-        gap: 12px;
-        width: 85%;
-        max-height: 85vh;
-        overflow-y: auto;
-    }
-
-    #start-modal h2,
-    #feedback-modal h2,
-    #reward-modal h2,
-    #pro-modal h2,
-    #final-modal h2 {
-        font-size: 1.6rem;
-    }
-
-    #start-modal p {
-        font-size: 1rem;
-        line-height: 1.4;
-    }
-
-    .signal-btn, .signal-btn-exp {
-        font-size: 0.9rem;
-        padding: 8px 16px;
-    }
-    
-    .trinket-badge {
-        font-size: 3rem;
-    }
 }
 
 .expert-mode #start-modal h2,
