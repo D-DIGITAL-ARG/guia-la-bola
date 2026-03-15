@@ -70,6 +70,7 @@ class RigidShape {
         if (this.points.length < 2) return;
 
         ctx.strokeStyle = this.color;
+        ctx.lineWidth = 10; // Ensure consistent thickness for obstacles
         
         ctx.beginPath();
         let first = this.points[0];
@@ -856,12 +857,6 @@ class Game {
 
                 this.showReward();
             }
-        } else if (this.ball) {
-            // Fall condition: ball falls off the frame boundary
-            if (this.ball.pos.y > this.boundaryMaxY + 50) {
-                this.levelCompleted = true;
-                this.showFeedback();
-            }
         }
     }
 
@@ -950,7 +945,9 @@ class Game {
         if (this.target) this.target.render(this.ctx);
 
         // Trazos ya completados (Objetos físicos)
+        // Set default stroke style and width before looping
         this.ctx.strokeStyle = this.brushStyle.color;
+        this.ctx.lineWidth = this.brushStyle.width;
         this.ctx.shadowBlur = 10;
         this.ctx.shadowColor = 'rgba(255, 255, 255, 0.4)';
 

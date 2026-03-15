@@ -114,6 +114,20 @@ body.expert-mode .grid-bg {
     white-space: nowrap;
 }
 
+@media (max-width: 600px) {
+    .signal-graphics {
+        flex-direction: column;
+        gap: 8px;
+        align-items: flex-start;
+        padding: 0.5rem 1rem;
+    }
+
+    .header-group {
+        width: 100%;
+        justify-content: space-between;
+    }
+}
+
 .expert-mode .signal-graphics {
     color: #ff8c00;
     text-shadow: 0 0 10px rgba(255, 140, 0, 0.5);
