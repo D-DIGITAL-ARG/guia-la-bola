@@ -17,8 +17,8 @@
 
 body,
 html {
-    width: 100%;
-    height: 100%;
+    width: 95%;
+    height: 95%;
     overflow: hidden;
     font-family: 'Space Grotesk', sans-serif;
 }
@@ -28,8 +28,8 @@ html {
     position: fixed;
     top: 0;
     left: 0;
-    width: 100vw;
-    height: 100vh;
+    width: 95vw;
+    height: 95vh;
     z-index: -1;
     /* Base Color */
     background-color: #016067;
@@ -63,8 +63,8 @@ body.expert-mode .grid-bg {
 /* Base Canvas */
 #gameCanvas {
     display: block;
-    width: 100vw;
-    height: 100vh;
+    width: 90vw;
+    height: 90vh;
     z-index: 1;
     position: relative;
 }
@@ -181,7 +181,7 @@ body.expert-mode .grid-bg {
     }
     
     .header-group {
-        width: 100%;
+        width: 95%;
         justify-content: space-between;
         gap: 5px;
     }
@@ -198,8 +198,8 @@ body.expert-mode .grid-bg {
     #final-modal {
         padding: 1.25rem;
         gap: 12px;
-        width: 85%;
-        max-height: 85vh;
+        width: 90%;
+        max-height: 90vh;
         overflow-y: auto;
     }
 
